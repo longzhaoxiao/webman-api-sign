@@ -1,7 +1,7 @@
 <?php
 
 namespace Wengg\WebmanApiSign\Driver;
-use think\facade\Db;
+use support\Db;
 
 /**
  * 数据库
@@ -24,7 +24,8 @@ class DatabaseDriver implements BaseDriver
         $db_cache_time = $this->config['db_cache_time'];
         $key  = is_null($db_cache_time) ? false : $app_id;
         $time = is_null($db_cache_time) ? 0     : $db_cache_time;
-        $data = Db::name($this->config['table'])->cache($key, $time)->where('app_id', $app_id)->find();
-        return $data ? (array) $data : [];
+        $data = Db::table($this->config['table'])->where('app_id', $app_id)->first();
+      
+        return $data ?   (array)$data : [];
     }
 }
