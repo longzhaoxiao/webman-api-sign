@@ -1,11 +1,13 @@
 <?php
 
 namespace Wengg\WebmanApiSign\Driver;
+
 use support\Db;
+use support\think\Cache;
 
 /**
  * 数据库
- * @author mosquito <zwj1206_hi@163.com> 2022-08-25
+ * @author bensharp <bensharp@qq.com> 2022-08-25
  */
 class DatabaseDriver implements BaseDriver
 {
@@ -22,10 +24,15 @@ class DatabaseDriver implements BaseDriver
     public function getInfo(string $app_id)
     {
         $db_cache_time = $this->config['db_cache_time'];
-        $key  = is_null($db_cache_time) ? false : $app_id;
-        $time = is_null($db_cache_time) ? 0     : $db_cache_time;
+        $key = is_null($db_cache_time) ? false : $app_id;
+        $expires = is_null($db_cache_time) ? 0 : $db_cache_time;
         $data = Db::table($this->config['table'])->where('app_id', $app_id)->first();
-      
-        return $data ?   (array)$data : [];
+        $cache_key = 'app_sign:' . $app_id ;
+        $data = Cache::remember($cache_key,
+            function () use ($app_id){
+                return Db::table($this->config['table'])->where('app_id', $app_id)->first() ?: null;
+            },
+            $expires);
+        return $data ? (array)$data : [];
     }
 }
