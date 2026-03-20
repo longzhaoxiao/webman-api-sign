@@ -24,9 +24,9 @@ class DatabaseDriver implements BaseDriver
     public function getInfo(string $app_id)
     {
         $db_cache_time = $this->config['db_cache_time'];
-        $key = is_null($db_cache_time) ? false : $app_id;
+
         $expires = is_null($db_cache_time) ? 0 : $db_cache_time;
-        $data = Db::table($this->config['table'])->where('app_id', $app_id)->first();
+
         $cache_key = 'app_sign:' . $app_id ;
         $data = Cache::remember($cache_key,
             function () use ($app_id){
